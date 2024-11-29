@@ -14,7 +14,7 @@ def scrape_twitch():
     options.add_argument("--disable-software-rasterizer")  # 禁用軟體光柵化
     options.add_argument("window-size=1920,1080")  # 設置窗口大小
 
-    driver_path = r"chromedriver.exe"  # 請確保已經放置好正確的 chromedriver 路徑
+    driver_path = r"chromedriver.exe" 
     service = Service(driver_path)
     driver = webdriver.Chrome(service=service, options=options)
 
@@ -42,17 +42,20 @@ def scrape_twitch():
         detailed_data = []
         for td in td_elements:
             try:
-                # 尋找 `mUIrbf-vQzf8d` 資料
-                detailed_info = td.find_element(By.CLASS_NAME, "mUIrbf-vQzf8d").text
+                # 尋找所有 `mUIrbf-vQzf8d` 資料
+                detailed_infos = td.find_elements(By.CLASS_NAME, "mUIrbf-vQzf8d")
+                # 抓取每個子元素的文本並存入列表
+                details = [info.text for info in detailed_infos]
             except NoSuchElementException:
-                # 若無資料，設定為 `None`
-                detailed_info = None
-            detailed_data.append(detailed_info)
+                # 若無資料，設定為空列表
+                details = []
+            detailed_data.append(details)
 
         # 輸出結果
         for i in range(len(mZ3RIc_elements)):
             if i < len(lqv0Cb_elements) and i < len(vdw3Ld_elements) and i < len(detailed_data):
-                print(f"{mZ3RIc_elements[i].text} | {lqv0Cb_elements[i].text} | {vdw3Ld_elements[i].text} | {detailed_data[i]}")
+                details_str = ", ".join(detailed_data[i]) if detailed_data[i] else "無詳細資料"
+                print(f"{mZ3RIc_elements[i].text} | {lqv0Cb_elements[i].text} | {vdw3Ld_elements[i].text} | {details_str}")
 
     except TimeoutException as te:
         print(f"超過等待時間: {te}")
